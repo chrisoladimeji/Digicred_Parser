@@ -1,22 +1,6 @@
-export { 
-  workflowExists,
-  getWorkflows, 
-  setWorkflows, 
-  getWorkflowByID, 
-  updateWorkflowByID, 
-  deleteWorkflowByID, 
-  deleteWorkflows, 
-  setWorkflowInstance, 
-  getWorkflowInstances, 
-  getWorkflowInstanceByID, 
-  updateWorkflowInstanceByID, 
-  deleteWorkflowInstanceByID, 
-  deleteWorkflowInstances, 
-  loadWorkflowsFromFile,
-  loadWorkflowsFromJson,
-  initDb, 
-} from './dbCrud';
+import 'reflect-metadata';
+import { WorkflowParser } from './wokflowparser';
 
 export {
-  parse
-} from './parser'
+    WorkflowParser
+} from './wokflowparser'

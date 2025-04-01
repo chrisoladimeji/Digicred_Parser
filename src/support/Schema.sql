@@ -10,7 +10,7 @@ CREATE TABLE workflows (
 CREATE TABLE instances (
   "instanceID" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   "workflowID" VARCHAR(255) REFERENCES workflows("workflowID"),
-  "connectionID" VARCHAR(255),
+  "clientID" VARCHAR(255),
   "currentState" VARCHAR(255),
   "stateData" JSONB
 );

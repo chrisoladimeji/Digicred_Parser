@@ -26,11 +26,11 @@ npm publish
 ## Installation
 
 ```sh
-npm install @@nas-veridid/workflow-parser
+npm install @veridid/workflow-parser
 ```
 
 or
 
 ```sh
-yarn add @@nas-veridid/workflow-parser
+yarn add @veridid/workflow-parser
 ```
