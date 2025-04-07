@@ -2,22 +2,23 @@ export interface IWorkflow {
 
     getWorkflowByID: (workflowID: string) => Promise<Workflow>;
     getInstanceByID: (workflowID: string, clientID: string) => Promise<Instance>;
+    updateInstanceByID: (clientID: string, workflowID: string, stateID: string, data: any) => Promise<Instance>;
+    newInstance: (clientID: string, workflowID: string, stateID: string, data: any) => Promise<Instance>;
 
 }
 
 export interface Workflow {
-    workflowID: string;
+    workflow_id: string;
     name: string;
-    formatVersion: string;
-    initialState: string;
+    initial_state: string;
     render: any[];
-    states: [{stateID: string, displayData: any, actions: any, tranistions: any}]
+    states: [{state_id: string, display_data: any, actions: any, transitions: any}]
 }
 
 export interface Instance {
-    instanceID: string;
-    workflowID: string;
-    clientID: string,
-    currentState: string;
-    stateData: any;
+    instance_id: string;
+    workflow_id: string;
+    client_id: string,
+    current_state: string;
+    state_data: any;
 }

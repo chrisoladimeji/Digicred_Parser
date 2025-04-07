@@ -1,6 +1,6 @@
 import 'reflect-metadata';
-import { WorkflowParser } from './wokflowparser';
+import { WorkflowParser } from './workflowparser';
 
 export {
     WorkflowParser
-} from './wokflowparser'
+} from './workflowparser'
