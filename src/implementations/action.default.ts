@@ -59,15 +59,10 @@ export class DefaultAction implements IAction{
                 }
             }
             // check the transitions until the first true condition
-            console.log("actionInput.action_id=", actionInput.actionID )
             let findtransition = state.transitions.find(item => { return eval(item.condition) })
-            console.log("findtransition=", findtransition);
             if(findtransition) {
                 transition = findtransition;
             }
-
-            console.log("transition=", transition);
-
         }
         return transition;
     }

@@ -114,22 +114,29 @@ var DefaultWorkflow = /** @class */ (function () {
     };
     DefaultWorkflow.prototype.updateInstanceByID = function (clientID, workflowID, stateID, data) {
         return __awaiter(this, void 0, void 0, function () {
-            var query, res;
+            var instance, query;
             var _a;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         console.log("*** updateInstance=", clientID, workflowID, stateID, data);
-                        // check instance and create new if does not exist
                         return [4 /*yield*/, this.getInstanceByID(clientID, workflowID)];
                     case 1:
-                        // check instance and create new if does not exist
-                        _b.sent();
+                        instance = _b.sent();
                         query = "UPDATE instances SET current_state = $1, state_data = $2 WHERE workflow_id = $3 AND client_id = $4";
+                        //console.log("query=", query);
+                        //console.log("stateID=", stateID, " data=", data);
+                        //console.log("workflowID=", stateID, " clientID=", clientID);
                         return [4 /*yield*/, ((_a = this.dbClient) === null || _a === void 0 ? void 0 : _a.query(query, [stateID, JSON.stringify(data), workflowID, clientID]))];
                     case 2:
-                        res = _b.sent();
-                        return [2 /*return*/, res.rows.length > 0 ? res.rows[0] : null];
+                        //console.log("query=", query);
+                        //console.log("stateID=", stateID, " data=", data);
+                        //console.log("workflowID=", stateID, " clientID=", clientID);
+                        _b.sent();
+                        return [4 /*yield*/, this.getInstanceByID(clientID, workflowID)];
+                    case 3:
+                        instance = _b.sent();
+                        return [2 /*return*/, instance];
                 }
             });
         });

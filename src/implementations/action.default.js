@@ -93,14 +93,10 @@ var DefaultAction = /** @class */ (function () {
                             default:
                         }
                     }
-                    // check the transitions until the first true condition
-                    console.log("actionInput.action_id=", actionInput.actionID);
                     findtransition = state.transitions.find(function (item) { return eval(item.condition); });
-                    console.log("findtransition=", findtransition);
                     if (findtransition) {
                         transition = findtransition;
                     }
-                    console.log("transition=", transition);
                 }
                 return [2 /*return*/, transition];
             });

@@ -43,31 +43,28 @@ var DefaultDisplay = /** @class */ (function () {
     DefaultDisplay.prototype.processDisplay = function (clientID, curentWorkflow, instance, currentState) {
         return __awaiter(this, void 0, void 0, function () {
             var displayData, display, displayTemplate, i;
-            return __generator(this, function (_a) {
+            var _a;
+            return __generator(this, function (_b) {
                 console.log("*** processDisplay");
-                console.log("instance=", instance);
-                console.log("states=", curentWorkflow.states);
                 displayData = { displayData: [] };
                 display = curentWorkflow.states.find(function (item) { return item.state_id == currentState; });
-                console.log("display=", display);
                 displayTemplate = display.display_data;
-                console.log("displayTemplate=", displayTemplate);
                 for (i = 0; i < displayTemplate.length; i++) {
                     // condition can use instance.stateData
-                    if (eval(displayTemplate[i])) {
-                        switch (displayTemplate[i].type) {
-                            case "text":
-                                displayTemplate[i].text = this.parseString(displayTemplate[i].text, instance.state_data);
-                                break;
-                            case "stateData":
-                                displayTemplate[i].metadata = this.parseString(displayTemplate[i].metadata, instance.state_data);
-                                break;
-                            case "control":
-                                displayTemplate[i].text = this.parseString(displayTemplate[i].text, instance.state_data);
-                                break;
+                    if ((_a = displayTemplate[i]) === null || _a === void 0 ? void 0 : _a.condition) {
+                        if (!eval(displayTemplate[i].condition)) {
+                            continue; // don't process if condition not met
                         }
-                        displayData.displayData[i] = displayTemplate[i];
                     }
+                    switch (displayTemplate[i].type) {
+                        case "text":
+                            displayTemplate[i].text = this.parseString(displayTemplate[i].text, instance.state_data);
+                            break;
+                        case "control":
+                            displayTemplate[i].text = this.parseString(displayTemplate[i].text, instance.state_data);
+                            break;
+                    }
+                    displayData.displayData[i] = displayTemplate[i];
                 }
                 return [2 /*return*/, displayData];
             });
@@ -81,14 +78,35 @@ var DefaultDisplay = /** @class */ (function () {
         // *** repalce this code with a more comprehensive parser
         for (var i = 1; i < parts.length; i += 2) {
             // find this value in the data
-            var value = data.find(parts[i]);
+            var value = this.findNode(parts[i], data);
             if (value) {
                 // if there is a value, replace the entry
                 parts[i] = value;
             }
         }
         // put the string back together again
-        return parts.join();
+        return parts.join("");
+    };
+    DefaultDisplay.prototype.findNode = function (id, currentNode) {
+        var currentChild, result;
+        if (id in currentNode) {
+            return currentNode[id];
+        }
+        else {
+            // use a for loop instead of forEach to avoid nested functions
+            // otherwise "return" will not work properly
+            for (var i = 0; currentNode.children !== undefined; i += 1) {
+                currentChild = currentNode.children[i];
+                // Search in the current child
+                result = this.findNode(id, currentChild);
+                // Return the result if the node has been found
+                if (result !== false) {
+                    return result;
+                }
+            }
+            // the node has not been found and we have no more options
+            return false;
+        }
     };
     return DefaultDisplay;
 }());

@@ -50,14 +50,15 @@ export class DefaultWorkflow implements IWorkflow {
     async updateInstanceByID(clientID: string, workflowID: string, stateID: string, data: any): Promise<Instance> {
         console.log("*** updateInstance=", clientID, workflowID, stateID, data);
         // check instance and create new if does not exist
-        await this.getInstanceByID(clientID, workflowID);
+        let instance = await this.getInstanceByID(clientID, workflowID);
         // update current_state and state_data
         const query = "UPDATE instances SET current_state = $1, state_data = $2 WHERE workflow_id = $3 AND client_id = $4";
         //console.log("query=", query);
         //console.log("stateID=", stateID, " data=", data);
         //console.log("workflowID=", stateID, " clientID=", clientID);
-        let res = await this.dbClient?.query(query, [stateID, JSON.stringify(data), workflowID, clientID]);
-        return res.rows.length > 0 ? res.rows[0] : null;
+        await this.dbClient?.query(query, [stateID, JSON.stringify(data), workflowID, clientID]);
+        instance = await this.getInstanceByID(clientID, workflowID);
+        return instance;
     }
 
 }

@@ -13,8 +13,18 @@
                     "state_id": "menu",
                     "display_data": [
                         {
-                            "type": "title",
-                            "text": "This is the test workflow."
+                            "type": "image",
+                            "url": "http://image.com/image.png"
+                        },
+                        {
+                            "type": "text",
+                            "display": "title",
+                            "text": "This is the test for workflow"
+                        },
+                        {
+                            "type": "text",
+                            "text": "First time showing this page",
+                            "condition": "instance?.state_data?.first==undefined"
                         },
                         {
                             "type": "button",
@@ -33,6 +43,12 @@
                         }
                     ],
                     "actions": [
+                        {
+                            "action_id": "nextButton",
+                            "type": "saveData",
+                            "condition": "true",
+                            "value": {"first": true }
+                        }                        
                     ],
                     "transitions": [
                         {
@@ -56,8 +72,8 @@
                     "state_id": "page1",
                     "display_data": [
                         {
-                            "type": "title",
-                            "text": "This is the page in the test workflow."
+                            "type": "text",
+                            "text": "This is the page for testing state transitions."
                         },
                         {
                             "type": "button",
@@ -82,8 +98,14 @@
                     "state_id": "page2",
                     "display_data": [
                         {
-                            "type": "title",
-                            "text": "This is the data page in the test workflow."
+                            "type": "text",
+                            "display": "title",
+                            "text": "This is the page for testing data."
+                        },
+                        {
+                            "type": "text",
+                            "text": "Date={Date}",
+                            "condition": "instance?.state_data?.Date!=undefined"
                         },
                         {
                             "type": "button",

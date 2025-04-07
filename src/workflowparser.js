@@ -53,20 +53,18 @@ var WorkflowParser = /** @class */ (function () {
                         return [4 /*yield*/, this.workflow.getWorkflowByID(action === null || action === void 0 ? void 0 : action.workflowID)];
                     case 1:
                         curentWorkflow = _a.sent();
-                        console.log("+++ currentWorkflow=", curentWorkflow);
+                        console.log("+++ currentWorkflow");
                         return [4 /*yield*/, this.workflow.getInstanceByID(clientID, action === null || action === void 0 ? void 0 : action.workflowID)];
                     case 2:
                         instance = _a.sent();
-                        console.log("+++ instance=", instance);
+                        console.log("+++ instance");
                         currentState = instance.current_state;
                         return [4 /*yield*/, this.action.processAction(curentWorkflow, instance, action)];
                     case 3:
                         transition = _a.sent();
-                        console.log("+++ transition=", transition);
+                        console.log("+++ transition");
                         if (!(transition.type != "none")) return [3 /*break*/, 7];
-                        console.log("++ has transition");
                         if (!(transition.type === 'workflowTransition')) return [3 /*break*/, 6];
-                        console.log("workflowTransition ", transition.workflow_id);
                         return [4 /*yield*/, this.workflow.getWorkflowByID(transition === null || transition === void 0 ? void 0 : transition.workflow_id)];
                     case 4:
                         // get the new workflow
@@ -79,21 +77,18 @@ var WorkflowParser = /** @class */ (function () {
                         _a.label = 6;
                     case 6:
                         if (transition.type === 'stateTransition') {
-                            console.log("stateTransition ", transition.state_id);
                             // set the new current state
                             currentState = transition.state_id;
-                            console.log("Chnaged to state=", currentState);
                         }
                         _a.label = 7;
                     case 7: return [4 /*yield*/, this.workflow.updateInstanceByID(clientID, curentWorkflow.workflow_id, currentState, instance.state_data)];
                     case 8:
                         updatedInstance = _a.sent();
-                        console.log("+++ Updated instace=", updatedInstance);
-                        return [4 /*yield*/, this.display.processDisplay(clientID, curentWorkflow, updatedInstance, currentState)
-                            // return workflowID and display
-                        ];
+                        console.log("+++ Updated instance");
+                        return [4 /*yield*/, this.display.processDisplay(clientID, curentWorkflow, updatedInstance, currentState)];
                     case 9:
                         display = _a.sent();
+                        console.log("+++ Prcoessed display");
                         // return workflowID and display
                         return [2 /*return*/, { workflowID: curentWorkflow.workflow_id, displayData: display.displayData }];
                 }

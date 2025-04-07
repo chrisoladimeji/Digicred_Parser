@@ -28,45 +28,41 @@ export class WorkflowParser {
 
         // get the workflow as JSON
         let curentWorkflow = await this.workflow.getWorkflowByID(action?.workflowID);
-        console.log("+++ currentWorkflow=", curentWorkflow);
+        console.log("+++ currentWorkflow");
 
         // get the instance as JSON
         let instance = await this.workflow.getInstanceByID(clientID, action?.workflowID);
-        console.log("+++ instance=", instance);
+        console.log("+++ instance");
 
         // current state in the workflow
         let currentState = instance.current_state;
 
         // process the action
         let transition = await this.action.processAction(curentWorkflow, instance, action);
-        console.log("+++ transition=", transition);
+        console.log("+++ transition");
 
         if(transition.type != "none") {
-            console.log("++ has transition")
             // process the transition
             if(transition.type === 'workflowTransition') {
-                console.log("workflowTransition ", transition.workflow_id);
                 // get the new workflow
                 curentWorkflow = await this.workflow.getWorkflowByID(transition?.workflow_id);
                 // get the new instance
                 instance = await this.workflow.getInstanceByID(clientID, transition?.workflow_id);
                 currentState = instance.current_state;
-
             }
             if(transition.type === 'stateTransition') {
-                console.log("stateTransition ",  transition.state_id);
                 // set the new current state
                 currentState = transition.state_id;
-                console.log("Chnaged to state=", currentState);
             }
         }
 
         // update the instance
         const updatedInstance = await this.workflow.updateInstanceByID(clientID, curentWorkflow.workflow_id, currentState, instance.state_data);
-        console.log("+++ Updated instace=", updatedInstance);
+        console.log("+++ Updated instance");
 
         // process the display
         const display = await this.display.processDisplay(clientID, curentWorkflow, updatedInstance, currentState)
+        console.log("+++ Prcoessed display");
 
         // return workflowID and display
         return {workflowID: curentWorkflow.workflow_id, displayData: display.displayData};
