@@ -4,6 +4,8 @@ import { DefaultAction } from '../src/implementations/action.default';
 import { DefaultWorkflow } from '../src/implementations/workflow.default';
 import { Client } from 'pg';
 import * as testWorkflows from './testworkflows.json'
+import { ExtendedAction } from './action.extension';
+import { ExtendedDisplay } from './display.extension';
 
 const testClient = new Client({
     user: 'admin',
@@ -39,10 +41,13 @@ addTable(testClient,
 );
 
 insertWorkflows(testClient);
-
 const defaultWorkflow = new DefaultWorkflow(testClient);
-const defaultAction = new DefaultAction();
-const defaultDisplay = new DefaultDisplay();
+
+const actionExtension = new ExtendedAction();
+const defaultAction = new DefaultAction(actionExtension);
+
+const displayExtenion = new ExtendedDisplay();
+const defaultDisplay = new DefaultDisplay(displayExtenion);
 
 const testParser = new WorkflowParser(defaultDisplay, defaultAction, defaultWorkflow);
 
@@ -132,6 +137,18 @@ async function runtests(): Promise<void> {
 
     console.log("~~~ Start Test 11 - return to root-menu workflow");
     display = await testParser.parse("TestPersonID", {workflowID: "other-menu", actionID: "noactionButton", data: {} });
+    console.log("Returns displaydata= %j", display);
+
+    console.log("~~~ Start Test 12 - go to page 2");
+    display = await testParser.parse("TestPersonID", {workflowID: "root-menu", actionID: "dataButton", data: {} });
+    console.log("Returns displaydata= %j", display);
+
+    console.log("~~~ Start Test 13 - extension test");
+    display = await testParser.parse("TestPersonID", {workflowID: "root-menu", actionID: "extensionButton", data: {} });
+    console.log("Returns displaydata= %j", display);
+
+    console.log("~~~ Start Test 14 - return to menu");
+    display = await testParser.parse("TestPersonID", {workflowID: "root-menu", actionID: "backButton", data: {} });
     console.log("Returns displaydata= %j", display);
 
 }

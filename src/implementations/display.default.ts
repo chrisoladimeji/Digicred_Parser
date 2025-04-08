@@ -1,7 +1,13 @@
+import { IDisplayExtension } from "../interfaces/displayextension";
 import { DisplayData, IDisplay } from "../interfaces/displayinterface";
 import { Instance, Workflow } from "../interfaces/workflowinterface";
 
 export class DefaultDisplay implements IDisplay {
+    displayExtension: IDisplayExtension;
+
+    constructor(displayExtension: IDisplayExtension) {
+        this.displayExtension = displayExtension;
+    }
 
     async processDisplay(
         clientID: string, 
@@ -23,6 +29,14 @@ export class DefaultDisplay implements IDisplay {
                 }
             }
             
+            // handle the types of displays from the extension first
+            if(this.displayExtension) {
+                let newValue = await this.displayExtension.displays(instance, displayTemplate[i]);
+                if(newValue) {
+                    displayTemplate[i]=newValue;
+                }
+            }
+
             switch(displayTemplate[i].type) {
                 case "text":
                     displayTemplate[i].text= this.parseString(displayTemplate[i].text, instance.state_data);

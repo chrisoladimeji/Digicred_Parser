@@ -38,35 +38,54 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DefaultDisplay = void 0;
 var DefaultDisplay = /** @class */ (function () {
-    function DefaultDisplay() {
+    function DefaultDisplay(displayExtension) {
+        this.displayExtension = displayExtension;
     }
     DefaultDisplay.prototype.processDisplay = function (clientID, curentWorkflow, instance, currentState) {
         return __awaiter(this, void 0, void 0, function () {
-            var displayData, display, displayTemplate, i;
+            var displayData, display, displayTemplate, i, newValue;
             var _a;
             return __generator(this, function (_b) {
-                console.log("*** processDisplay");
-                displayData = { displayData: [] };
-                display = curentWorkflow.states.find(function (item) { return item.state_id == currentState; });
-                displayTemplate = display.display_data;
-                for (i = 0; i < displayTemplate.length; i++) {
-                    // condition can use instance.stateData
-                    if ((_a = displayTemplate[i]) === null || _a === void 0 ? void 0 : _a.condition) {
-                        if (!eval(displayTemplate[i].condition)) {
-                            continue; // don't process if condition not met
+                switch (_b.label) {
+                    case 0:
+                        console.log("*** processDisplay");
+                        displayData = { displayData: [] };
+                        display = curentWorkflow.states.find(function (item) { return item.state_id == currentState; });
+                        displayTemplate = display.display_data;
+                        i = 0;
+                        _b.label = 1;
+                    case 1:
+                        if (!(i < displayTemplate.length)) return [3 /*break*/, 5];
+                        // condition can use instance.stateData
+                        if ((_a = displayTemplate[i]) === null || _a === void 0 ? void 0 : _a.condition) {
+                            if (!eval(displayTemplate[i].condition)) {
+                                return [3 /*break*/, 4]; // don't process if condition not met
+                            }
                         }
-                    }
-                    switch (displayTemplate[i].type) {
-                        case "text":
-                            displayTemplate[i].text = this.parseString(displayTemplate[i].text, instance.state_data);
-                            break;
-                        case "control":
-                            displayTemplate[i].text = this.parseString(displayTemplate[i].text, instance.state_data);
-                            break;
-                    }
-                    displayData.displayData[i] = displayTemplate[i];
+                        if (!this.displayExtension) return [3 /*break*/, 3];
+                        return [4 /*yield*/, this.displayExtension.displays(instance, displayTemplate[i])];
+                    case 2:
+                        newValue = _b.sent();
+                        if (newValue) {
+                            displayTemplate[i] = newValue;
+                        }
+                        _b.label = 3;
+                    case 3:
+                        switch (displayTemplate[i].type) {
+                            case "text":
+                                displayTemplate[i].text = this.parseString(displayTemplate[i].text, instance.state_data);
+                                break;
+                            case "control":
+                                displayTemplate[i].text = this.parseString(displayTemplate[i].text, instance.state_data);
+                                break;
+                        }
+                        displayData.displayData[i] = displayTemplate[i];
+                        _b.label = 4;
+                    case 4:
+                        i++;
+                        return [3 /*break*/, 1];
+                    case 5: return [2 /*return*/, displayData];
                 }
-                return [2 /*return*/, displayData];
             });
         });
     };

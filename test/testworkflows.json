@@ -108,6 +108,10 @@
                             "condition": "instance?.state_data?.Date!=undefined"
                         },
                         {
+                            "type": "extended",
+                            "text": "Extended text"
+                        },
+                        {
                             "type": "button",
                             "text": "Save Data",
                             "action_id": "saveButton"
@@ -116,6 +120,11 @@
                             "type": "button",
                             "text": "State Data",
                             "action_id": "stateButton"
+                        },
+                        {
+                            "type": "button",
+                            "text": "Extension",
+                            "action_id": "extensionButton"
                         },
                         {
                             "type": "button",
@@ -129,6 +138,12 @@
                             "type": "stateData",
                             "condition": "true",
                             "value": "action.data"
+                        },
+                        {
+                            "action_id": "extensionButton",
+                            "type": "extension",
+                            "condition": "true",
+                            "value": {"extended": true }
                         },
                         {
                             "action_id": "saveButton",

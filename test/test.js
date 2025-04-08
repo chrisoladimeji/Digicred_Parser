@@ -42,6 +42,8 @@ var action_default_1 = require("../src/implementations/action.default");
 var workflow_default_1 = require("../src/implementations/workflow.default");
 var pg_1 = require("pg");
 var testWorkflows = require("./testworkflows.json");
+var action_extension_1 = require("./action.extension");
+var display_extension_1 = require("./display.extension");
 var testClient = new pg_1.Client({
     user: 'admin',
     password: 'root',
@@ -56,8 +58,10 @@ addTable(testClient, "CREATE TABLE workflows (\n        workflow_id VARCHAR(255)
 addTable(testClient, "CREATE TABLE instances (\n        instance_id UUID PRIMARY KEY,\n        workflow_id VARCHAR(255),\n        client_id VARCHAR(255), \n        current_state VARCHAR(255),\n        state_data JSONB\n    );");
 insertWorkflows(testClient);
 var defaultWorkflow = new workflow_default_1.DefaultWorkflow(testClient);
-var defaultAction = new action_default_1.DefaultAction();
-var defaultDisplay = new display_default_1.DefaultDisplay();
+var actionExtension = new action_extension_1.ExtendedAction();
+var defaultAction = new action_default_1.DefaultAction(actionExtension);
+var displayExtenion = new display_extension_1.ExtendedDisplay();
+var defaultDisplay = new display_default_1.DefaultDisplay(displayExtenion);
 var testParser = new workflowparser_1.WorkflowParser(defaultDisplay, defaultAction, defaultWorkflow);
 function connectDatabase(dbClient) {
     return __awaiter(this, void 0, void 0, function () {
@@ -203,6 +207,21 @@ function runtests() {
                     console.log("~~~ Start Test 11 - return to root-menu workflow");
                     return [4 /*yield*/, testParser.parse("TestPersonID", { workflowID: "other-menu", actionID: "noactionButton", data: {} })];
                 case 11:
+                    display = _a.sent();
+                    console.log("Returns displaydata= %j", display);
+                    console.log("~~~ Start Test 12 - go to page 2");
+                    return [4 /*yield*/, testParser.parse("TestPersonID", { workflowID: "root-menu", actionID: "dataButton", data: {} })];
+                case 12:
+                    display = _a.sent();
+                    console.log("Returns displaydata= %j", display);
+                    console.log("~~~ Start Test 13 - extension test");
+                    return [4 /*yield*/, testParser.parse("TestPersonID", { workflowID: "root-menu", actionID: "extensionButton", data: {} })];
+                case 13:
+                    display = _a.sent();
+                    console.log("Returns displaydata= %j", display);
+                    console.log("~~~ Start Test 14 - return to menu");
+                    return [4 /*yield*/, testParser.parse("TestPersonID", { workflowID: "root-menu", actionID: "backButton", data: {} })];
+                case 14:
                     display = _a.sent();
                     console.log("Returns displaydata= %j", display);
                     return [2 /*return*/];

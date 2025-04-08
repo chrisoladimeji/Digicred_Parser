@@ -38,24 +38,31 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DefaultAction = void 0;
 var DefaultAction = /** @class */ (function () {
-    function DefaultAction() {
+    function DefaultAction(actionExtension) {
+        this.actionExtension = actionExtension;
     }
     DefaultAction.prototype.processAction = function (currentWorkflow, instance, actionInput) {
         return __awaiter(this, void 0, void 0, function () {
             var transition, state, action, findtransition;
             return __generator(this, function (_a) {
-                console.log("*** processAction action=", actionInput);
-                transition = {
-                    type: "none",
-                    workflow_id: instance.workflow_id,
-                    state_id: instance.current_state
-                };
-                if (actionInput.actionID != "") {
-                    state = currentWorkflow.states.find(function (item) { return item.state_id == instance.current_state; });
-                    //console.log("Actions=", state.actions);
-                    // Only process actions if there are any
-                    if (state.actions.length > 0) {
+                switch (_a.label) {
+                    case 0:
+                        console.log("*** processAction action=", actionInput);
+                        transition = {
+                            type: "none",
+                            workflow_id: instance.workflow_id,
+                            state_id: instance.current_state
+                        };
+                        if (!(actionInput.actionID != "")) return [3 /*break*/, 4];
+                        state = currentWorkflow.states.find(function (item) { return item.state_id == instance.current_state; });
+                        if (!(state.actions.length > 0)) return [3 /*break*/, 3];
                         action = state.actions.find(function (item) { return item.action_id == actionInput.actionID; });
+                        if (!this.actionExtension) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.actionExtension.actions(actionInput, instance, action, transition)];
+                    case 1:
+                        transition = _a.sent();
+                        _a.label = 2;
+                    case 2:
                         // handle the types of actions
                         switch (action === null || action === void 0 ? void 0 : action.type) {
                             case "saveData":
@@ -63,7 +70,6 @@ var DefaultAction = /** @class */ (function () {
                                 if (eval(action.condition)) {
                                     // save the data from the workflow action to the instance data
                                     instance.state_data = Object.assign(instance.state_data, action.value);
-                                    //console.log("Saved data=", instance.state_data);                    
                                 }
                                 break;
                             case "stateData":
@@ -71,7 +77,6 @@ var DefaultAction = /** @class */ (function () {
                                 if (eval(action.condition)) {
                                     // save the data from the actionInput to the instance data
                                     instance.state_data = Object.assign(instance.state_data, actionInput.data);
-                                    //console.log("State data=", instance.state_data);                    
                                 }
                                 break;
                             case "stateTransition":
@@ -92,13 +97,15 @@ var DefaultAction = /** @class */ (function () {
                                 break;
                             default:
                         }
-                    }
-                    findtransition = state.transitions.find(function (item) { return eval(item.condition); });
-                    if (findtransition) {
-                        transition = findtransition;
-                    }
+                        _a.label = 3;
+                    case 3:
+                        findtransition = state.transitions.find(function (item) { return eval(item.condition); });
+                        if (findtransition) {
+                            transition = findtransition;
+                        }
+                        _a.label = 4;
+                    case 4: return [2 /*return*/, transition];
                 }
-                return [2 /*return*/, transition];
             });
         });
     };

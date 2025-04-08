@@ -1,8 +1,13 @@
+import { IActionExtension } from "../interfaces/actionextension";
 import { IAction, Transition } from "../interfaces/actioninterface";
 import { Instance, Workflow } from "../interfaces/workflowinterface";
 
 export class DefaultAction implements IAction{
+    actionExtension: IActionExtension;
 
+    constructor(actionExtension: IActionExtension) {
+        this.actionExtension = actionExtension;
+    }
     
     async processAction(currentWorkflow: Workflow, instance: Instance, actionInput: any): Promise<Transition>{
         console.log("*** processAction action=", actionInput);
@@ -15,12 +20,14 @@ export class DefaultAction implements IAction{
 
         if(actionInput.actionID!="") {
             // find the state
-            //console.log("currentState=", instance.current_state);
             const state = currentWorkflow.states.find(item => { return item.state_id == instance.current_state });
-            //console.log("Actions=", state.actions);
             // Only process actions if there are any
             if(state.actions.length>0) {
                 const action = state.actions.find(item => { return item.action_id == actionInput.actionID })
+                // handle the types of actions from the extension first
+                if(this.actionExtension) {
+                    transition = await this.actionExtension.actions(actionInput, instance, action, transition)
+                }
                 // handle the types of actions
                 switch(action?.type) {
                     case "saveData":
@@ -28,7 +35,6 @@ export class DefaultAction implements IAction{
                         if(eval(action.condition)) {
                             // save the data from the workflow action to the instance data
                             instance.state_data = Object.assign(instance.state_data, action.value);
-                            //console.log("Saved data=", instance.state_data);                    
                         }
                         break;
                     case "stateData":
@@ -36,7 +42,6 @@ export class DefaultAction implements IAction{
                         if(eval(action.condition)) {
                             // save the data from the actionInput to the instance data
                             instance.state_data = Object.assign(instance.state_data, actionInput.data);
-                            //console.log("State data=", instance.state_data);                    
                         }
                         break;
                     case "stateTransition":
