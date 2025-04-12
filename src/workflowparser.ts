@@ -1,6 +1,9 @@
 import { IDisplay } from "./interfaces/displayinterface";
 import { IAction } from "./interfaces/actioninterface";
 import { IWorkflow } from "./interfaces/workflowinterface";
+import { DefaultWorkflow } from "./implementations/workflow.default";
+import { DefaultAction } from "./implementations/action.default";
+import { DefaultDisplay } from "./implementations/display.default";
 
 export class WorkflowParser {
     display: IDisplay;
@@ -67,4 +70,10 @@ export class WorkflowParser {
         // return workflowID and display
         return {workflowID: curentWorkflow.workflow_id, displayData: display.displayData};
     }
+}
+
+export {
+    DefaultWorkflow,
+    DefaultAction,
+    DefaultDisplay,
 }

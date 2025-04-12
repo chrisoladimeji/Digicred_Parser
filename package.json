@@ -1,14 +1,21 @@
 {
-  "name": "parser",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "@veridid/workflow-parser",
+  "version": "0.4.6",
+  "description": "For parsing JSON data that represents data-driven state machines and delivering the display data for clients to render.",
+  "main": "dist/index.js",
   "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
     "test": " tsc --resolveJsonModule test/test.ts && node test/test.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["workflow", "Parser", "Data-Driven State Machine"],
+  "author": "VeriDID Corp.  Nas Til and Dave McKay",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DigiCred-Holdings/workflow-parser.git"
+  },
+  "homepage": "https://github.com/DigiCred-Holdings/workflow-parser#readme",
   "devDependencies": {
     "typescript": "^5.8.2"
   },
@@ -18,5 +25,8 @@
     "reflect-metadata": "^0.2.2",
     "typedi": "^0.10.0",
     "uuid": "^11.1.0"
-  }
+  },
+  "files": [
+    "dist"
+  ]
 }
