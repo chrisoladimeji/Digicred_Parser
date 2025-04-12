@@ -1,6 +1,11 @@
 import { IDisplay } from "./interfaces/displayinterface";
 import { IAction } from "./interfaces/actioninterface";
 import { IWorkflow } from "./interfaces/workflowinterface";
+import { IActionExtension } from "./interfaces/actionextension";
+import { IDisplayExtension } from "./interfaces/displayextension";
+import { Transition } from './interfaces/actioninterface';
+import { Instance } from './interfaces/workflowinterface';
+import { Workflow } from './interfaces/workflowinterface';
 
 export class WorkflowParser {
     display: IDisplay;
@@ -72,8 +77,5 @@ export class WorkflowParser {
 export { DefaultWorkflow } from './implementations/workflow.default';
 export { DefaultAction } from './implementations/action.default';
 export { DefaultDisplay } from './implementations/display.default';
-export { IActionExtension } from './interfaces/actionextension';
-export { IDisplayExtension } from './interfaces/displayextension';
-export { Transition } from './interfaces/actioninterface';
-export { Instance } from './interfaces/workflowinterface';
-export { Workflow } from './interfaces/workflowinterface';
+export { IActionExtension, IDisplayExtension };
+export { Transition, Instance, Workflow };
