@@ -10,7 +10,8 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "strictPropertyInitialization": false,
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
+        "declaration": true
     },
     "include": ["src/**/*", "./src/index.d.ts"],
     "lib": ["es2015"]
