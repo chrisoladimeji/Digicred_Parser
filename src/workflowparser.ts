@@ -72,3 +72,8 @@ export class WorkflowParser {
 export { DefaultWorkflow } from './implementations/workflow.default';
 export { DefaultAction } from './implementations/action.default';
 export { DefaultDisplay } from './implementations/display.default';
+export { IActionExtension } from './interfaces/actionextension';
+export { IDisplayExtension } from './interfaces/displayextension';
+export { Transition } from './interfaces/actioninterface';
+export { Instance } from './interfaces/workflowinterface';
+export { Workflow } from './interfaces/workflowinterface';
