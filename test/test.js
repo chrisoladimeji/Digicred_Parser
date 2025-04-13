@@ -44,30 +44,80 @@ var pg_1 = require("pg");
 var testWorkflows = require("./testworkflows.json");
 var action_extension_1 = require("./action.extension");
 var display_extension_1 = require("./display.extension");
-var testClient = new pg_1.Client({
+var client = {
     user: 'admin',
     password: 'root',
     host: 'localhost',
     port: 5432,
     database: 'test_workflows'
-});
-connectDatabase(testClient);
-dropTable(testClient, "workflows");
-dropTable(testClient, "instances");
-addTable(testClient, "CREATE TABLE workflows (\n        workflow_id VARCHAR(255) PRIMARY KEY, \n        name VARCHAR(255),\n        initial_state VARCHAR(255),\n        render JSONB,\n        states JSONB\n    );");
-addTable(testClient, "CREATE TABLE instances (\n        instance_id UUID PRIMARY KEY,\n        workflow_id VARCHAR(255),\n        client_id VARCHAR(255), \n        current_state VARCHAR(255),\n        state_data JSONB\n    );");
-insertWorkflows(testClient);
-var defaultWorkflow = new workflow_default_1.DefaultWorkflow(testClient);
+};
+var defaultWorkflow = new workflow_default_1.DefaultWorkflow(client);
 var actionExtension = new action_extension_1.ExtendedAction();
 var defaultAction = new action_default_1.DefaultAction(actionExtension);
 var displayExtenion = new display_extension_1.ExtendedDisplay();
 var defaultDisplay = new display_default_1.DefaultDisplay(displayExtenion);
 var testParser = new workflowparser_1.WorkflowParser(defaultDisplay, defaultAction, defaultWorkflow);
+function setupForTesting() {
+    return __awaiter(this, void 0, void 0, function () {
+        var testClient;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    testClient = new pg_1.Client(client);
+                    console.log("Connecto to database");
+                    return [4 /*yield*/, connectDatabase(testClient)];
+                case 1:
+                    _a.sent();
+                    console.log("Drop workflows table");
+                    return [4 /*yield*/, dropTable(testClient, "workflows")];
+                case 2:
+                    _a.sent();
+                    console.log("Drop instances table");
+                    return [4 /*yield*/, dropTable(testClient, "instances")];
+                case 3:
+                    _a.sent();
+                    console.log("Add workflows table");
+                    return [4 /*yield*/, addTable(testClient, "CREATE TABLE workflows (\n            workflow_id VARCHAR(255) PRIMARY KEY, \n            name VARCHAR(255),\n            initial_state VARCHAR(255),\n            render JSONB,\n            states JSONB\n        );")];
+                case 4:
+                    _a.sent();
+                    console.log("Add instances table");
+                    return [4 /*yield*/, addTable(testClient, "CREATE TABLE instances (\n            instance_id UUID PRIMARY KEY,\n            workflow_id VARCHAR(255),\n            client_id VARCHAR(255), \n            current_state VARCHAR(255),\n            state_data JSONB\n        );")];
+                case 5:
+                    _a.sent();
+                    console.log("Insert workflows");
+                    return [4 /*yield*/, insertWorkflows(testClient)];
+                case 6:
+                    _a.sent();
+                    console.log("Disconnect database");
+                    return [4 /*yield*/, disconnectDatabase(testClient)];
+                case 7:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
 function connectDatabase(dbClient) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
-            dbClient.connect();
-            return [2 /*return*/];
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, dbClient.connect()];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+function disconnectDatabase(dbClient) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, dbClient.end()];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
         });
     });
 }
@@ -82,7 +132,6 @@ function dropTable(dbClient, table) {
                     return [4 /*yield*/, dbClient.query('DROP TABLE IF EXISTS ' + table + ';')];
                 case 1:
                     result = _a.sent();
-                    console.log(result);
                     return [3 /*break*/, 3];
                 case 2:
                     error_1 = _a.sent();
@@ -104,7 +153,6 @@ function addTable(dbClient, tableSql) {
                     return [4 /*yield*/, dbClient.query(tableSql)];
                 case 1:
                     result = _a.sent();
-                    console.log(result);
                     return [3 /*break*/, 3];
                 case 2:
                     error_2 = _a.sent();
@@ -153,75 +201,77 @@ function runtests() {
         var display;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
+                case 0: return [4 /*yield*/, setupForTesting()];
+                case 1:
+                    _a.sent();
                     console.log("~~~ Start Test 1 - Load default workflow and state");
                     return [4 /*yield*/, testParser.parse("TestPersonID", { workflowID: "root-menu", actionID: "", data: {} })];
-                case 1:
+                case 2:
                     display = _a.sent();
                     console.log("Returns displaydata= %j", display);
                     console.log("~~~ Start Test 2 - go to Page1");
                     return [4 /*yield*/, testParser.parse("TestPersonID", { workflowID: "root-menu", actionID: "nextButton", data: {} })];
-                case 2:
+                case 3:
                     display = _a.sent();
                     console.log("Returns displaydata= %j", display);
                     console.log("~~~ Start Test 3 - return from Page1 to menu");
                     return [4 /*yield*/, testParser.parse("TestPersonID", { workflowID: "root-menu", actionID: "backButton", data: {} })];
-                case 3:
+                case 4:
                     display = _a.sent();
                     console.log("Returns displaydata= %j", display);
                     console.log("~~~ Start Test 4 - go to page 2");
                     return [4 /*yield*/, testParser.parse("TestPersonID", { workflowID: "root-menu", actionID: "dataButton", data: {} })];
-                case 4:
+                case 5:
                     display = _a.sent();
                     console.log("Returns displaydata= %j", display);
                     console.log("~~~ Start Test 5 - save fixed data");
                     return [4 /*yield*/, testParser.parse("TestPersonID", { workflowID: "root-menu", actionID: "saveButton", data: {} })];
-                case 5:
+                case 6:
                     display = _a.sent();
                     console.log("Returns displaydata= %j", display);
                     console.log("~~~ Start Test 6 - save mobile data");
                     return [4 /*yield*/, testParser.parse("TestPersonID", { workflowID: "root-menu", actionID: "stateButton", data: { "Date": "Today" } })];
-                case 6:
+                case 7:
                     display = _a.sent();
                     console.log("Returns displaydata= %j", display);
                     console.log("~~~ Start Test 7 - return to menu");
                     return [4 /*yield*/, testParser.parse("TestPersonID", { workflowID: "root-menu", actionID: "backButton", data: {} })];
-                case 7:
+                case 8:
                     display = _a.sent();
                     console.log("Returns displaydata= %j", display);
                     console.log("~~~ Start Test 8 - go to new workflow");
                     return [4 /*yield*/, testParser.parse("TestPersonID", { workflowID: "root-menu", actionID: "workflowButton", data: {} })];
-                case 8:
+                case 9:
                     display = _a.sent();
                     console.log("Returns displaydata= %j", display);
                     console.log("~~~ Start Test 9 - go back to root-menu workflow");
                     return [4 /*yield*/, testParser.parse("TestPersonID", { workflowID: "other-menu", actionID: "homeButton", data: {} })];
-                case 9:
+                case 10:
                     display = _a.sent();
                     console.log("Returns displaydata= %j", display);
                     console.log("~~~ Start Test 10 - go to new workflow");
                     return [4 /*yield*/, testParser.parse("TestPersonID", { workflowID: "root-menu", actionID: "workflowButton", data: {} })];
-                case 10:
+                case 11:
                     display = _a.sent();
                     console.log("Returns displaydata= %j", display);
                     console.log("~~~ Start Test 11 - return to root-menu workflow");
                     return [4 /*yield*/, testParser.parse("TestPersonID", { workflowID: "other-menu", actionID: "noactionButton", data: {} })];
-                case 11:
+                case 12:
                     display = _a.sent();
                     console.log("Returns displaydata= %j", display);
                     console.log("~~~ Start Test 12 - go to page 2");
                     return [4 /*yield*/, testParser.parse("TestPersonID", { workflowID: "root-menu", actionID: "dataButton", data: {} })];
-                case 12:
+                case 13:
                     display = _a.sent();
                     console.log("Returns displaydata= %j", display);
                     console.log("~~~ Start Test 13 - extension test");
                     return [4 /*yield*/, testParser.parse("TestPersonID", { workflowID: "root-menu", actionID: "extensionButton", data: {} })];
-                case 13:
+                case 14:
                     display = _a.sent();
                     console.log("Returns displaydata= %j", display);
                     console.log("~~~ Start Test 14 - return to menu");
                     return [4 /*yield*/, testParser.parse("TestPersonID", { workflowID: "root-menu", actionID: "backButton", data: {} })];
-                case 14:
+                case 15:
                     display = _a.sent();
                     console.log("Returns displaydata= %j", display);
                     return [2 /*return*/];

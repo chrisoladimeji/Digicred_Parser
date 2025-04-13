@@ -7,41 +7,19 @@ import * as testWorkflows from './testworkflows.json'
 import { ExtendedAction } from './action.extension';
 import { ExtendedDisplay } from './display.extension';
 
-const testClient = new Client({
+const client = {
     user: 'admin',
     password: 'root',
     host: 'localhost',
     port: 5432,
     database: 'test_workflows'
-})
+}
 
-connectDatabase(testClient);
 
-dropTable(testClient, "workflows");
-dropTable(testClient, "instances");
 
-addTable(testClient, 
-    `CREATE TABLE workflows (
-        workflow_id VARCHAR(255) PRIMARY KEY, 
-        name VARCHAR(255),
-        initial_state VARCHAR(255),
-        render JSONB,
-        states JSONB
-    );`
-)
 
-addTable(testClient, 
-    `CREATE TABLE instances (
-        instance_id UUID PRIMARY KEY,
-        workflow_id VARCHAR(255),
-        client_id VARCHAR(255), 
-        current_state VARCHAR(255),
-        state_data JSONB
-    );`
-);
 
-insertWorkflows(testClient);
-const defaultWorkflow = new DefaultWorkflow(testClient);
+const defaultWorkflow = new DefaultWorkflow(client);
 
 const actionExtension = new ExtendedAction();
 const defaultAction = new DefaultAction(actionExtension);
@@ -51,15 +29,58 @@ const defaultDisplay = new DefaultDisplay(displayExtenion);
 
 const testParser = new WorkflowParser(defaultDisplay, defaultAction, defaultWorkflow);
 
-async function connectDatabase(dbClient: Client): Promise<void>{
-    dbClient.connect()
+async function setupForTesting() {
+    const testClient = new Client(client);
+    console.log("Connecto to database");
+    await connectDatabase(testClient);
+    
+    console.log("Drop workflows table");
+    await dropTable(testClient, "workflows");
+    console.log("Drop instances table");
+    await dropTable(testClient, "instances");
+    
+    console.log("Add workflows table");
+    await addTable(testClient, 
+        `CREATE TABLE workflows (
+            workflow_id VARCHAR(255) PRIMARY KEY, 
+            name VARCHAR(255),
+            initial_state VARCHAR(255),
+            render JSONB,
+            states JSONB
+        );`
+    )
+    
+    console.log("Add instances table");
+    await addTable(testClient, 
+        `CREATE TABLE instances (
+            instance_id UUID PRIMARY KEY,
+            workflow_id VARCHAR(255),
+            client_id VARCHAR(255), 
+            current_state VARCHAR(255),
+            state_data JSONB
+        );`
+    );
+    
+    console.log("Insert workflows");
+    await insertWorkflows(testClient);
+
+    console.log("Disconnect database");
+    await disconnectDatabase(testClient);
 }
+
+
+async function connectDatabase(dbClient: Client): Promise<void>{
+    await dbClient.connect();
+}
+async function disconnectDatabase(dbClient: Client): Promise<void>{
+    await dbClient.end();
+}
+
 
 async function dropTable(dbClient: Client, table: string): Promise<void> {
     try {
         console.log("*** Drop Table - ", table);
         const result = await dbClient.query('DROP TABLE IF EXISTS ' + table + ';');
-        console.log(result);
     }
     catch(error) {
         console.log("Drop workflows error=", error);
@@ -70,7 +91,6 @@ async function addTable(dbClient: Client, tableSql: string): Promise<void> {
     try {
         console.log("*** Create Tables");
         const result = await dbClient.query(tableSql);
-        console.log(result);
     }
     catch(error) {
         console.log("Drop table error=", error);
@@ -95,6 +115,8 @@ async function insertWorkflows(dbClient: Client): Promise<void> {
 
 
 async function runtests(): Promise<void> {
+    await setupForTesting();
+
     console.log("~~~ Start Test 1 - Load default workflow and state");
     let display = await testParser.parse("TestPersonID", {workflowID: "root-menu", actionID: "", data: {} });
     console.log("Returns displaydata= %j", display);
@@ -154,6 +176,7 @@ async function runtests(): Promise<void> {
 }
 
 // start test
+
 runtests();
 
 

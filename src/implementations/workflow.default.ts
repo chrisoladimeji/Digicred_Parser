@@ -5,8 +5,15 @@ import { v4 as uuidv4 } from 'uuid';
 export class DefaultWorkflow implements IWorkflow {
     dbClient: Client;
 
-    constructor(dbClient: Client) {
-        this.dbClient = dbClient;
+    constructor(dbClient: any) {
+        console.log("DefaultWorkflow constructor dbCLient=", dbClient);
+        this.dbClient = new Client(dbClient);
+        this.connectDB();
+    }
+
+    async connectDB() {
+        await this.dbClient.connect();
+        console.log("Database connected");
     }
 
     async getWorkflowByID(workflowID: string): Promise<Workflow> {

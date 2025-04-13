@@ -37,11 +37,27 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DefaultWorkflow = void 0;
+var pg_1 = require("pg");
 var uuid_1 = require("uuid");
 var DefaultWorkflow = /** @class */ (function () {
     function DefaultWorkflow(dbClient) {
-        this.dbClient = dbClient;
+        console.log("DefaultWorkflow constructor dbCLient=", dbClient);
+        this.dbClient = new pg_1.Client(dbClient);
+        this.connectDB();
     }
+    DefaultWorkflow.prototype.connectDB = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.dbClient.connect()];
+                    case 1:
+                        _a.sent();
+                        console.log("Database connected");
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
     DefaultWorkflow.prototype.getWorkflowByID = function (workflowID) {
         return __awaiter(this, void 0, void 0, function () {
             var res;

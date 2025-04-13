@@ -1,6 +1,6 @@
 {
   "name": "@veridid/workflow-parser",
-  "version": "0.4.11",
+  "version": "0.4.14",
   "description": "For parsing JSON data that represents data-driven state machines and delivering the display data for clients to render.",
   "main": "dist/index.js",
   "types": "dist/workflowparser.d.ts",
