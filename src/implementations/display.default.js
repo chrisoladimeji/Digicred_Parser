@@ -79,7 +79,7 @@ var DefaultDisplay = /** @class */ (function () {
                                 displayTemplate[i].text = this.parseString(displayTemplate[i].text, instance.state_data);
                                 break;
                         }
-                        displayData.displayData[i] = displayTemplate[i];
+                        displayData.displayData.push(displayTemplate[i]);
                         _b.label = 4;
                     case 4:
                         i++;
