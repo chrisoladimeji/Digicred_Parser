@@ -43,8 +43,9 @@ export class WorkflowParser {
         let currentState = instance.current_state;
 
         // process the action
-        let transition = await this.action.processAction(curentWorkflow, instance, action);
+        let [transition, newInstance] = await this.action.processAction(curentWorkflow, instance, action);
         console.log("+++ transition");
+        Object.assign(instance, newInstance);
 
         if(transition.type != "none") {
             // process the transition
@@ -65,12 +66,18 @@ export class WorkflowParser {
         const updatedInstance = await this.workflow.updateInstanceByID(clientID, curentWorkflow.workflow_id, currentState, instance.state_data);
         console.log("+++ Updated instance");
 
-        // process the display
-        const display = await this.display.processDisplay(clientID, curentWorkflow, updatedInstance, currentState)
-        console.log("+++ Prcoessed display");
+        if(transition.type != "none-nodisplay") {
+            // process the display
+            const display = await this.display.processDisplay(clientID, curentWorkflow, updatedInstance, currentState)
+            console.log("+++ Processed display");
+            return {workflowID: curentWorkflow.workflow_id, displayData: display?.displayData};
+        }
+        else {
+            console.log("+++ Skip display");
+            return {workflowID: curentWorkflow.workflow_id};
+        }
 
         // return workflowID and display
-        return {workflowID: curentWorkflow.workflow_id, displayData: display.displayData};
     }
 }
 

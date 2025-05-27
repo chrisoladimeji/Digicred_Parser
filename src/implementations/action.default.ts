@@ -9,7 +9,7 @@ export class DefaultAction implements IAction{
         this.actionExtension = actionExtension;
     }
     
-    async processAction(currentWorkflow: Workflow, instance: Instance, actionInput: any): Promise<Transition>{
+    async processAction(currentWorkflow: Workflow, instance: Instance, actionInput: any): Promise<[Transition, Instance]>{
         console.log("*** processAction action=", actionInput);
         // start with a blank transition
         let transition:Transition = {    
@@ -26,7 +26,7 @@ export class DefaultAction implements IAction{
                 const action = state.actions.find(item => { return item.action_id == actionInput.actionID })
                 // handle the types of actions from the extension first
                 if(this.actionExtension) {
-                    transition = await this.actionExtension.actions(actionInput, instance, action, transition)
+                    [transition, instance] = await this.actionExtension.actions(actionInput, instance, action, transition)
                 }
                 // handle the types of actions
                 switch(action?.type) {
@@ -69,6 +69,6 @@ export class DefaultAction implements IAction{
                 transition = findtransition;
             }
         }
-        return transition;
+        return [transition, instance];
     }
 }

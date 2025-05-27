@@ -75,6 +75,33 @@ var DefaultDisplay = /** @class */ (function () {
                             case "text":
                                 displayTemplate[i].text = this.parseString(displayTemplate[i].text, instance.state_data);
                                 break;
+                            case "title":
+                                displayTemplate[i].text = this.parseString(displayTemplate[i].text, instance.state_data);
+                                break;
+                            case "warning":
+                                displayTemplate[i].text = this.parseString(displayTemplate[i].text, instance.state_data);
+                                break;
+                            case "information":
+                                displayTemplate[i].text = this.parseString(displayTemplate[i].text, instance.state_data);
+                                break;
+                            case "quote":
+                                displayTemplate[i].text = this.parseString(displayTemplate[i].text, instance.state_data);
+                                break;
+                            case "text-field":
+                                displayTemplate[i].value = this.parseString(displayTemplate[i].value, instance.state_data);
+                                break;
+                            case "text-area":
+                                displayTemplate[i].value = this.parseString(displayTemplate[i].value, instance.state_data);
+                                break;
+                            case "drop-down":
+                                displayTemplate[i].value = this.parseString(displayTemplate[i].value, instance.state_data);
+                                break;
+                            case "radio-button":
+                                displayTemplate[i].default = this.parseString(displayTemplate[i].value, instance.state_data);
+                                break;
+                            case "check-box":
+                                displayTemplate[i].default = this.parseString(displayTemplate[i].value, instance.state_data);
+                                break;
                             case "control":
                                 displayTemplate[i].text = this.parseString(displayTemplate[i].text, instance.state_data);
                                 break;

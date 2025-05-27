@@ -55,7 +55,7 @@ var ExtendedAction = /** @class */ (function () {
                         break;
                     default:
                 }
-                return [2 /*return*/, transition];
+                return [2 /*return*/, [transition, instance]];
             });
         });
     };

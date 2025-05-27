@@ -3,5 +3,5 @@ import { IAction, Transition } from "./actioninterface"
 
 
 export interface IActionExtension {
-    actions: (actionInput: any, instance: Instance, action: any, transtion: Transition) => Promise<Transition>;
+    actions: (actionInput: any, instance: Instance, action: any, transtion: Transition) => Promise<[Transition, Instance]>;
 }

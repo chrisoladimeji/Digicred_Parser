@@ -44,8 +44,9 @@ var DefaultAction = /** @class */ (function () {
     DefaultAction.prototype.processAction = function (currentWorkflow, instance, actionInput) {
         return __awaiter(this, void 0, void 0, function () {
             var transition, state, action, findtransition;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
                         console.log("*** processAction action=", actionInput);
                         transition = {
@@ -60,8 +61,8 @@ var DefaultAction = /** @class */ (function () {
                         if (!this.actionExtension) return [3 /*break*/, 2];
                         return [4 /*yield*/, this.actionExtension.actions(actionInput, instance, action, transition)];
                     case 1:
-                        transition = _a.sent();
-                        _a.label = 2;
+                        _a = _b.sent(), transition = _a[0], instance = _a[1];
+                        _b.label = 2;
                     case 2:
                         // handle the types of actions
                         switch (action === null || action === void 0 ? void 0 : action.type) {
@@ -97,14 +98,14 @@ var DefaultAction = /** @class */ (function () {
                                 break;
                             default:
                         }
-                        _a.label = 3;
+                        _b.label = 3;
                     case 3:
                         findtransition = state.transitions.find(function (item) { return eval(item.condition); });
                         if (findtransition) {
                             transition = findtransition;
                         }
-                        _a.label = 4;
-                    case 4: return [2 /*return*/, transition];
+                        _b.label = 4;
+                    case 4: return [2 /*return*/, [transition, instance]];
                 }
             });
         });

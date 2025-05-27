@@ -45,52 +45,56 @@ var WorkflowParser = /** @class */ (function () {
     }
     WorkflowParser.prototype.parse = function (clientID, action) {
         return __awaiter(this, void 0, void 0, function () {
-            var curentWorkflow, instance, currentState, transition, updatedInstance, display;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var curentWorkflow, instance, currentState, _a, transition, newInstance, updatedInstance, display;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
                         console.log("=== parse clientID=", clientID, " action=", action);
                         return [4 /*yield*/, this.workflow.getWorkflowByID(action === null || action === void 0 ? void 0 : action.workflowID)];
                     case 1:
-                        curentWorkflow = _a.sent();
+                        curentWorkflow = _b.sent();
                         console.log("+++ currentWorkflow");
                         return [4 /*yield*/, this.workflow.getInstanceByID(clientID, action === null || action === void 0 ? void 0 : action.workflowID)];
                     case 2:
-                        instance = _a.sent();
+                        instance = _b.sent();
                         console.log("+++ instance");
                         currentState = instance.current_state;
                         return [4 /*yield*/, this.action.processAction(curentWorkflow, instance, action)];
                     case 3:
-                        transition = _a.sent();
+                        _a = _b.sent(), transition = _a[0], newInstance = _a[1];
                         console.log("+++ transition");
+                        Object.assign(instance, newInstance);
                         if (!(transition.type != "none")) return [3 /*break*/, 7];
                         if (!(transition.type === 'workflowTransition')) return [3 /*break*/, 6];
                         return [4 /*yield*/, this.workflow.getWorkflowByID(transition === null || transition === void 0 ? void 0 : transition.workflow_id)];
                     case 4:
                         // get the new workflow
-                        curentWorkflow = _a.sent();
+                        curentWorkflow = _b.sent();
                         return [4 /*yield*/, this.workflow.getInstanceByID(clientID, transition === null || transition === void 0 ? void 0 : transition.workflow_id)];
                     case 5:
                         // get the new instance
-                        instance = _a.sent();
+                        instance = _b.sent();
                         currentState = instance.current_state;
-                        _a.label = 6;
+                        _b.label = 6;
                     case 6:
                         if (transition.type === 'stateTransition') {
                             // set the new current state
                             currentState = transition.state_id;
                         }
-                        _a.label = 7;
+                        _b.label = 7;
                     case 7: return [4 /*yield*/, this.workflow.updateInstanceByID(clientID, curentWorkflow.workflow_id, currentState, instance.state_data)];
                     case 8:
-                        updatedInstance = _a.sent();
+                        updatedInstance = _b.sent();
                         console.log("+++ Updated instance");
+                        if (!(transition.type != "none-nodisplay")) return [3 /*break*/, 10];
                         return [4 /*yield*/, this.display.processDisplay(clientID, curentWorkflow, updatedInstance, currentState)];
                     case 9:
-                        display = _a.sent();
-                        console.log("+++ Prcoessed display");
-                        // return workflowID and display
-                        return [2 /*return*/, { workflowID: curentWorkflow.workflow_id, displayData: display.displayData }];
+                        display = _b.sent();
+                        console.log("+++ Processed display");
+                        return [2 /*return*/, { workflowID: curentWorkflow.workflow_id, displayData: display === null || display === void 0 ? void 0 : display.displayData }];
+                    case 10:
+                        console.log("+++ Skip display");
+                        return [2 /*return*/, { workflowID: curentWorkflow.workflow_id }];
                 }
             });
         });

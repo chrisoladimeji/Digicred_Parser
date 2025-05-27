@@ -1,7 +1,7 @@
 import { Instance, IWorkflow, Workflow } from "./workflowinterface";
 
 export interface IAction {
-    processAction: (currentWorkflow: Workflow, instance: Instance, action: any) => Promise<Transition>;
+    processAction: (currentWorkflow: Workflow, instance: Instance, action: any) => Promise<[Transition, Instance]>;
 }
 
 export interface Transition {

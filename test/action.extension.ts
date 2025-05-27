@@ -3,7 +3,7 @@ import { Transition } from "../src/interfaces/actioninterface";
 import { Instance, Workflow } from "../src/interfaces/workflowinterface";
 
 export class ExtendedAction implements IActionExtension {
-    async actions(actionInput: any, instance: Instance, action: any, transition: Transition): Promise<Transition>{
+    async actions(actionInput: any, instance: Instance, action: any, transition: Transition): Promise<[Transition, Instance]>{
         console.log("^^^ Extension -> actions");
         // handle the types of actions
         switch(action?.type) {
@@ -17,6 +17,6 @@ export class ExtendedAction implements IActionExtension {
             default:
         }
     
-        return transition;
+        return [transition, instance];
     };
 }
