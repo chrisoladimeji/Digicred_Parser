@@ -129,6 +129,10 @@ var DefaultDisplay = /** @class */ (function () {
                 // if there is a value, replace the entry
                 parts[i] = value;
             }
+            else {
+                // if there is no current value, replace the {field} with blank ""
+                parts[i] = "";
+            }
         }
         // put the string back together again
         return parts.join("");

@@ -127,6 +127,20 @@
                             "action_id": "extensionButton"
                         },
                         {
+                            "form": "Save Form",
+                            "type": "text-field",
+                            "label": "Field one",
+                            "value": "{save-field}",
+                            "form-id": "save-field"
+                        },                        
+                        {
+                            "form": "Save Form",
+                            "type": "text-field",
+                            "label": "Field two",
+                            "value": "{Date}",
+                            "form-id": "save-field2"
+                        },                        
+                        {
                             "type": "button",
                             "text": "Go back",
                             "action_id": "backButton"
