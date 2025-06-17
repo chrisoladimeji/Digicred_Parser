@@ -1,3 +1,4 @@
+   // __tests__/my-module.test.ts
 import { WorkflowParser } from '../src/workflowparser';
 import { DefaultDisplay } from '../src/implementations/display.default';
 import { DefaultAction } from '../src/implementations/action.default';
@@ -15,23 +16,21 @@ const client = {
     database: 'test_workflows'
 }
 
-
-
-
-
 const defaultWorkflow = new DefaultWorkflow(client);
 
 const actionExtension = new ExtendedAction();
+
 const defaultAction = new DefaultAction(actionExtension);
 
 const displayExtenion = new ExtendedDisplay();
+
 const defaultDisplay = new DefaultDisplay(displayExtenion);
 
 const testParser = new WorkflowParser(defaultDisplay, defaultAction, defaultWorkflow);
 
 async function setupForTesting() {
     const testClient = new Client(client);
-    console.log("Connecto to database");
+    console.log("Connect to database");
     await connectDatabase(testClient);
     
     console.log("Drop workflows table");
@@ -113,9 +112,28 @@ async function insertWorkflows(dbClient: Client): Promise<void> {
     } 
 }
 
-
-async function runtests(): Promise<void> {
+async function setup(): Promise<void> {
     await setupForTesting();
+    console.log("=== Completed setup");
+}
+
+
+it('Get the default state from the workflow', async () => {
+    await setup();
+    console.log("*** Start test");
+    const display = await testParser.parse("TestPersonID", {workflowID: "root-menu", actionID: "", data: {} });    
+    expect(display).toStrictEqual({"displayData": [{"type": "image", "url": "http://image.com/image.png"}, {"display": "title", "text": "This is the test for workflow", "type": "text"}, {"condition": "instance?.state_data?.first==undefined", "text": "First time showing this page", "type": "text"}, {"action_id": "nextButton", "text": "Next button", "type": "button"}, {"action_id": "dataButton", "text": "Data button", "type": "button"}, {"action_id": "workflowButton", "text": "Workflow button", "type": "button"}], "workflowID": "root-menu"});
+});
+
+it('Got to page1', async () => {
+    const display = await testParser.parse("TestPersonID", {workflowID: "root-menu", actionID: "nextButton", data: {} });
+    expect(display).toStrictEqual({"displayData": [{"type": "image", "url": "http://image.com/image.png"}, {"display": "title", "text": "This is the test for workflow", "type": "text"}, {"condition": "instance?.state_data?.first==undefined", "text": "First time showing this page", "type": "text"}, {"action_id": "nextButton", "text": "Next button", "type": "button"}, {"action_id": "dataButton", "text": "Data button", "type": "button"}, {"action_id": "workflowButton", "text": "Workflow button", "type": "button"}], "workflowID": "root-menu"});
+});
+
+
+/*
+async function runtests(): Promise<void> {
+   
 
     console.log("~~~ Start Test 1 - Load default workflow and state");
     let display = await testParser.parse("TestPersonID", {workflowID: "root-menu", actionID: "", data: {} });
@@ -172,11 +190,5 @@ async function runtests(): Promise<void> {
     console.log("~~~ Start Test 14 - return to menu");
     display = await testParser.parse("TestPersonID", {workflowID: "root-menu", actionID: "backButton", data: {} });
     console.log("Returns displaydata= %j", display);
-
 }
-
-// start test
-
-runtests();
-
-
+*/
