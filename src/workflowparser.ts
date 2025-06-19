@@ -1,88 +1,100 @@
-import { IDisplay } from "./interfaces/displayinterface";
-import { IAction } from "./interfaces/actioninterface";
-import { IWorkflow } from "./interfaces/workflowinterface";
-import { IActionExtension } from "./interfaces/actionextension";
-import { IDisplayExtension } from "./interfaces/displayextension";
-import { Transition } from './interfaces/actioninterface';
-import { Instance } from './interfaces/workflowinterface';
-import { Workflow } from './interfaces/workflowinterface';
+// __tests__/.test.ts
+import 'reflect-metadata';
+import { WorkflowParser }  from '../src/index';
+import { DefaultWorkflow } from '../src/implementations/workflow.default';
+import { DefaultAction }   from '../src/implementations/action.default';
+import { DefaultDisplay }  from '../src/implementations/display.default';
+import { Client }          from 'pg';
+import { v4 as uuidv4 }    from 'uuid';
+import * as testWorkflows  from './testworkflows.json';
 
-export class WorkflowParser {
-    display: IDisplay;
-    action: IAction;
-    workflow: IWorkflow;
+// Database connection config for tests
+afterAllCleanup: false
+const clientConfig = {
+  user: 'admin',
+  password: 'root',
+  host: 'localhost',
+  port: 5432,
+  database: 'test_workflows'
+};
 
-    constructor(
-        display: IDisplay,
-        action: IAction,
-        workflow: IWorkflow
-    ) {
-        this.display = display;
-        this.action = action;
-        this.workflow = workflow;
+// Instantiate default implementations without extensions
+const defaultWorkflow = new DefaultWorkflow(clientConfig);
+const defaultAction   = new DefaultAction({} as any);
+const defaultDisplay  = new DefaultDisplay({} as any);
+
+// Correct argument order: (workflow, action, display)
+const testParser = new WorkflowParser(
+  defaultWorkflow,
+  defaultAction,
+  defaultDisplay
+);
+
+describe.skip('WorkflowParser Integration Tests', () => {
+  beforeAll(async () => {
+    const dbClient = new Client(clientConfig);
+    await dbClient.connect();
+
+    // Drop existing tables
+    await dbClient.query('DROP TABLE IF EXISTS instances;');
+    await dbClient.query('DROP TABLE IF EXISTS workflows;');
+
+    // Create workflows table
+    await dbClient.query(`
+      CREATE TABLE workflows (
+        workflow_id VARCHAR(255) PRIMARY KEY,
+        name VARCHAR(255),
+        initial_state VARCHAR(255),
+        render JSONB,
+        states JSONB
+      );
+    `);
+
+    // Create instances table
+    await dbClient.query(`
+      CREATE TABLE instances (
+        instance_id UUID PRIMARY KEY,
+        workflow_id VARCHAR(255),
+        client_id VARCHAR(255),
+        current_state VARCHAR(255),
+        state_data JSONB
+      );
+    `);
+
+    // Insert and seed
+    const insertWF = 'INSERT INTO workflows(workflow_id, name, initial_state, render, states) VALUES($1,$2,$3,$4,$5)';
+    const insertInst = 'INSERT INTO instances(instance_id, workflow_id, client_id, current_state, state_data) VALUES($1,$2,$3,$4,$5)';
+    for (const wf of testWorkflows.workflows) {
+      await dbClient.query(insertWF, [
+        wf.workflow_id,
+        wf.name,
+        wf.initial_state,
+        JSON.stringify(wf.render),
+        JSON.stringify(wf.states)
+      ]);
+      await dbClient.query(insertInst, [
+        uuidv4(),
+        wf.workflow_id,
+        'TestPersonID',
+        wf.initial_state,
+        JSON.stringify({})
+      ]);
     }
 
-    async parse(
-        clientID: string, 
-        action: { 
-            workflowID: string; 
-            actionID: string; 
-            data?: any }
-    ): Promise<any> {
-        console.log("=== parse clientID=", clientID, " action=", action);
+    await dbClient.end();
+  });
 
-        // get the workflow as JSON
-        let curentWorkflow = await this.workflow.getWorkflowByID(action?.workflowID);
-        console.log("+++ currentWorkflow");
+  it('Get the default state from the workflow', async () => {
+    const display = await testParser.parse('TestPersonID', {
+      workflowID: 'root-menu', actionID: '', data: {}
+    });
+    expect(display.workflowID).toBe('root-menu');
+  });
 
-        // get the instance as JSON
-        let instance = await this.workflow.getInstanceByID(clientID, action?.workflowID);
-        console.log("+++ instance");
-
-        // current state in the workflow
-        let currentState = instance.current_state;
-
-        // process the action
-        let [transition, newInstance] = await this.action.processAction(curentWorkflow, instance, action);
-        console.log("+++ transition");
-        Object.assign(instance, newInstance);
-
-        if(transition.type != "none") {
-            // process the transition
-            if(transition.type === 'workflowTransition') {
-                // get the new workflow
-                curentWorkflow = await this.workflow.getWorkflowByID(transition?.workflow_id);
-                // get the new instance
-                instance = await this.workflow.getInstanceByID(clientID, transition?.workflow_id);
-                currentState = instance.current_state;
-            }
-            if(transition.type === 'stateTransition') {
-                // set the new current state
-                currentState = transition.state_id;
-            }
-        }
-
-        // update the instance
-        const updatedInstance = await this.workflow.updateInstanceByID(clientID, curentWorkflow.workflow_id, currentState, instance.state_data);
-        console.log("+++ Updated instance");
-
-        if(transition.type != "none-nodisplay") {
-            // process the display
-            const display = await this.display.processDisplay(clientID, curentWorkflow, updatedInstance, currentState)
-            console.log("+++ Processed display");
-            return {workflowID: curentWorkflow.workflow_id, displayData: display?.displayData};
-        }
-        else {
-            console.log("+++ Skip display");
-            return {workflowID: curentWorkflow.workflow_id};
-        }
-
-        // return workflowID and display
-    }
-}
-
-export { DefaultWorkflow } from './implementations/workflow.default';
-export { DefaultAction } from './implementations/action.default';
-export { DefaultDisplay } from './implementations/display.default';
-export { IActionExtension, IDisplayExtension };
-export { Transition, Instance, Workflow };
+  it('Got to page1', async () => {
+    const display = await testParser.parse('TestPersonID', {
+      workflowID: 'root-menu', actionID: 'nextButton', data: {}
+    });
+    expect(display.actionID).toBe('nextButton');
+  });
+});

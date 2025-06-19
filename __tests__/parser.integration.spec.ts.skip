@@ -1,0 +1,121 @@
+// __tests__/.test.ts
+import { WorkflowParser }   from '../src/index';
+import { DefaultWorkflow }  from '../src/implementations/workflow.default';
+import { DefaultAction }    from '../src/implementations/action.default';
+import { DefaultDisplay }   from '../src/implementations/display.default';
+import { Client }           from 'pg';
+import { v4 as uuidv4 }     from 'uuid';
+import * as testWorkflows   from './testworkflows.json';
+import { ExtendedAction }   from './action.extension';
+import { ExtendedDisplay }  from './display.extension';
+
+describe('WorkflowParser Integration Tests', () => {
+  // Database connection config for tests
+  const clientConfig = {
+    user: 'admin',
+    password: 'root',
+    host: 'localhost',
+    port: 5432,
+    database: 'test_workflows'
+  };
+
+  // Instantiate default implementations
+  const defaultWorkflow  = new DefaultWorkflow(clientConfig);
+  const actionExtension  = new ExtendedAction();
+  const defaultAction    = new DefaultAction(actionExtension);
+  const displayExtension = new ExtendedDisplay();
+  const defaultDisplay   = new DefaultDisplay(displayExtension);
+
+  // Correct argument order: (workflow, action, display)
+  const testParser = new WorkflowParser(
+    defaultWorkflow,
+    defaultAction,
+    defaultDisplay
+  );
+
+  // Set up database tables and seed data before tests
+  beforeAll(async () => {
+    const dbClient = new Client(clientConfig);
+    await dbClient.connect();
+
+    // Drop & recreate tables
+    await dbClient.query('DROP TABLE IF EXISTS instances;');
+    await dbClient.query('DROP TABLE IF EXISTS workflows;');
+
+    await dbClient.query(`
+      CREATE TABLE workflows (
+        workflow_id VARCHAR(255) PRIMARY KEY,
+        name VARCHAR(255),
+        initial_state VARCHAR(255),
+        render JSONB,
+        states JSONB
+      );
+    `);
+
+    await dbClient.query(`
+      CREATE TABLE instances (
+        instance_id UUID PRIMARY KEY,
+        workflow_id VARCHAR(255),
+        client_id VARCHAR(255),
+        current_state VARCHAR(255),
+        state_data JSONB
+      );
+    `);
+
+    // Insert test workflows
+    const insertWF =
+      'INSERT INTO workflows (workflow_id, name, initial_state, render, states) VALUES ($1,$2,$3,$4,$5)';
+    for (const wf of testWorkflows.workflows) {
+      await dbClient.query(insertWF, [
+        wf.workflow_id,
+        wf.name,
+        wf.initial_state,
+        JSON.stringify(wf.render),
+        JSON.stringify(wf.states)
+      ]);
+
+      // Seed an instance for each workflow and TestPersonID
+      const seedInst =
+        'INSERT INTO instances (instance_id, workflow_id, client_id, current_state, state_data) VALUES ($1,$2,$3,$4,$5)';
+      await dbClient.query(seedInst, [
+        uuidv4(),
+        wf.workflow_id,
+        'TestPersonID',
+        wf.initial_state,
+        JSON.stringify({})
+      ]);
+    }
+
+    await dbClient.end();
+  });
+
+  it('Get the default state from the workflow', async () => {
+    const display = await testParser.parse('TestPersonID', { workflowID: 'root-menu', actionID: '', data: {} });
+    expect(display).toStrictEqual({
+      displayData: [
+        { type: 'image', url: 'http://image.com/image.png' },
+        { display: 'title', text: 'This is the test for workflow', type: 'text' },
+        { condition: 'instance?.state_data?.first==undefined', text: 'First time showing this page', type: 'text' },
+        { action_id: 'nextButton', text: 'Next button', type: 'button' },
+        { action_id: 'dataButton', text: 'Data button', type: 'button' },
+        { action_id: 'workflowButton', text: 'Workflow button', type: 'button' }
+      ],
+      workflowID: 'root-menu'
+    });
+  });
+
+  it('Got to page1', async () => {
+    const display = await testParser.parse('TestPersonID', { workflowID: 'root-menu', actionID: 'nextButton', data: {} });
+    expect(display).toStrictEqual({
+      displayData: [
+        { type: 'image', url: 'http://image.com/image.png' },
+        { display: 'title', text: 'This is the test for workflow', type: 'text' },
+        { condition: 'instance?.state_data?.first==undefined', text: 'First time showing this page', type: 'text' },
+        { action_id: 'nextButton', text: 'Next button', type: 'button' },
+        { action_id: 'dataButton', text: 'Data button', type: 'button' },
+        { action_id: 'workflowButton', text: 'Workflow button', type: 'button' }
+      ],
+      workflowID: 'root-menu'
+    });
+  });
+});

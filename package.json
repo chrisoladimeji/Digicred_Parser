@@ -7,7 +7,9 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "jest"
+    "test": "jest --config jest.config.ts --verbose",
+    "test:ts": "jest --config jest.config.ts --verbose",
+    "test:js": "jest --config jest.config.js --verbose"
   },
   "keywords": [
     "workflow",
@@ -22,9 +24,9 @@
   },
   "homepage": "https://github.com/DigiCred-Holdings/workflow-parser#readme",
   "devDependencies": {
-    "@types/jest": "^29.5.14",
-    "jest": "^29.7.0",
-    "ts-jest": "^29.3.4",
+    "@types/jest": "^30.0.0",
+    "jest": "^30.0.2",
+    "ts-jest": "^29.4.0",
     "typescript": "^5.8.2"
   },
   "dependencies": {

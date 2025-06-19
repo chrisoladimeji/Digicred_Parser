@@ -1,36 +1,40 @@
-# workflow-parser
+# Digicred_Parser
 
-Workflow Parser is a TypeScript Node.js module for parsing and managing workflow definitions in a PostgreSQL database. It retrieves workflows and instances, parses data, and handles state transitions. Ideal for managing complex workflows and integrating action-menu features.
+A lightweight, configurable workflow‐parser for Digicred applications, written in TypeScript and designed for easy integration with CI/CD pipelines and Slack notifications.
+#Unit Test by Christopher Oladimeji
 
-## Key Features
+---
 
-- **Database Integration:** Connects to a PostgreSQL database to store and manage workflow definitions and instances.
-- **Workflow Management:** Supports defining workflows with states, transitions, actions, and display data.
-- **State Parsing:** Parses workflows to handle state transitions based on predefined conditions.
-- **Modular Design:** Can be easily integrated into different applications, including NestJS projects.
+## 🚀 Features
 
-## development
+- **Workflow Parsing**  
+  • Load workflows from PostgreSQL.  
+  • Execute actions and render display templates.  
+- **Zero-Config Defaults**  
+  Falls back to sensible defaults for database, action logic, and display rendering.  
+- **Extensible Plugins**  
+  Swap in your own `IWorkflow`, `IActionExtension`, or `IDisplayExtension` implementations.  
+- **Unit-Tested**  
+  Jest suite with full mocking of DB, business logic, and rendering.  
+- **CI-Ready**  
+  GitHub Actions workflow included to run tests on push/PR.  
+- **Slack Notifications**  
+  Notify your team of pass/fail statuses automatically.
 
-```sh
-npm run build
-```
+---
 
-and
+## 🛠️ Getting Started
 
-Must be logged into npm
+### Prerequisites
 
-```sh
-npm publish
-```
+- Node.js ≥ 16  
+- Yarn  
+- PostgreSQL (for integration testing or production)
 
-## Installation
+### Installation
 
-```sh
-npm install @veridid/workflow-parser
-```
+```bash
+git clone https://github.com/chrisoladimeji/Digicred_Parser.git
+cd Digicred_Parser
+yarn install
 
-or
-
-```sh
-yarn add @veridid/workflow-parser
-```
