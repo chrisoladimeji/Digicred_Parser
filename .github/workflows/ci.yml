@@ -1,0 +1,44 @@
+# .github/workflows/ci.yml
+name: Digicred CI UnitTest and Slack-Notify
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js & Yarn cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run Jest unit tests
+        run: yarn test
+
+      - name: Notify Slack of test results
+        if: always()
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          channel-id: ${{ vars.SLACK_CHANNEL_ID }}
+          # Simplified message to ensure syntax is correct
+          text: |
+            *${{ vars.SLACK_MESSAGE }}*
+            Repository: ${{ github.repository }}
+            Branch: ${{ github.ref_name }}
+            Status: ${{ job.status }}
+            <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Workflow Run>
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
