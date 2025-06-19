@@ -32,12 +32,12 @@ jobs:
         uses: slackapi/slack-github-action@v1.26.0
         with:
           channel-id: ${{ vars.SLACK_CHANNEL_ID }}
-          # Simplified message to ensure syntax is correct
-          text: |
+          # Corrected input name from 'text:' to 'slack-message:'
+          slack-message: |
             *${{ vars.SLACK_MESSAGE }}*
-            Repository: ${{ github.repository }}
-            Branch: ${{ github.ref_name }}
-            Status: ${{ job.status }}
+            Repository: `${{ github.repository }}`
+            Branch: `${{ github.ref_name }}`
+            Status: `${{ job.status }}`
             <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Workflow Run>
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
